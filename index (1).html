@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelGroup - Find Your Perfect Group Trip</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Icons as React components
+        const Icon = ({ name, className = "w-5 h-5", ...props }) => {
+            const icons = {
+                calendar: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                ),
+                mapPin: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                ),
+                users: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                ),
+                shield: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                ),
+                check: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                ),
+                heart: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                ),
+                heartFilled: (
+                    <svg className={className} fill="currentColor" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                ),
+                arrowLeft: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                ),
+                search: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                ),
+                filter: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                ),
+                x: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                ),
+                chevronRight: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                ),
+                user: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                ),
+                plus: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                ),
+                upload: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                ),
+                menu: (
+                    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                ),
+            };
+            return icons[name] || null;
+        };
+
+        // Mock Data
+        const mockTrips = [
+            {
+                id: 'trip_1',
+                title: 'Goa Beach Yoga Retreat',
+                location: 'Goa',
+                startDate: '2026-02-15',
+                endDate: '2026-02-18',
+                duration: '3 days, 2 nights',
+                price: 8500,
+                groupType: 'women_only',
+                interests: ['wellness', 'beach'],
+                spotsTotal: 12,
+                spotsFilled: 8,
+                image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&auto=format&fit=crop',
+                host: {
+                    id: 'host_1',
+                    name: 'Priya Sharma',
+                    verified: true,
+                    tripsHosted: 15,
+                    bio: "Yoga instructor passionate about wellness travel and creating safe spaces for women to explore.",
+                    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop'
+                },
+                description: 'Unwind with daily yoga sessions on pristine beaches, enjoy healthy meals, and connect with like-minded women in this rejuvenating retreat.',
+                itinerary: [
+                    { day: 1, activities: 'Arrival at Goa, welcome session, beach walk, sunset yoga' },
+                    { day: 2, activities: 'Morning yoga, beach time, local market visit, wellness workshop' },
+                    { day: 3, activities: 'Sunrise yoga, healthy breakfast, checkout and departure' }
+                ],
+                included: ['Accommodation (shared rooms)', 'All meals', 'Yoga sessions', 'Airport transfers'],
+                notIncluded: ['Flight tickets', 'Personal expenses', 'Travel insurance'],
+                lastBooked: '2 hours ago'
+            },
+            {
+                id: 'trip_2',
+                title: 'Rishikesh Rapids & Camping',
+                location: 'Rishikesh',
+                startDate: '2026-03-01',
+                endDate: '2026-03-03',
+                duration: '2 days, 2 nights',
+                price: 6500,
+                groupType: 'mixed',
+                interests: ['adventure'],
+                spotsTotal: 15,
+                spotsFilled: 12,
+                image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&auto=format&fit=crop',
+                host: {
+                    id: 'host_2',
+                    name: 'Arjun Mehta',
+                    verified: true,
+                    tripsHosted: 22,
+                    bio: "Adventure enthusiast and certified rafting guide with 8 years of experience.",
+                    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop'
+                },
+                description: 'Experience the thrill of white water rafting on the Ganges, camp under the stars, and enjoy bonfire nights with adventure seekers.',
+                itinerary: [
+                    { day: 1, activities: 'Arrival, safety briefing, camping setup, evening bonfire' },
+                    { day: 2, activities: 'Morning rafting session, lunch, cliff jumping, sunset by river' },
+                    { day: 3, activities: 'Breakfast, morning trek, checkout' }
+                ],
+                included: ['Camping equipment', 'All meals', 'Rafting gear', 'Certified guide'],
+                notIncluded: ['Transport to Rishikesh', 'Personal expenses'],
+                lastBooked: '5 hours ago'
+            },
+            {
+                id: 'trip_3',
+                title: 'Ooty Nature Camp for Families',
+                location: 'Ooty',
+                startDate: '2026-02-20',
+                endDate: '2026-02-23',
+                duration: '3 days, 2 nights',
+                price: 5500,
+                groupType: 'family_friendly',
+                interests: ['nature', 'family'],
+                spotsTotal: 20,
+                spotsFilled: 14,
+                image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&auto=format&fit=crop',
+                host: {
+                    id: 'host_3',
+                    name: 'Lakshmi Iyer',
+                    verified: true,
+                    tripsHosted: 18,
+                    bio: "Family travel specialist helping parents create memorable experiences with their kids.",
+                    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop'
+                },
+                description: 'Perfect getaway for families! Nature walks, kid-friendly activities, comfortable accommodation, and quality time together.',
+                itinerary: [
+                    { day: 1, activities: 'Arrival, welcome tea, botanical garden visit, kids play area' },
+                    { day: 2, activities: 'Nature trail, toy train ride, picnic lunch, lake boating' },
+                    { day: 3, activities: 'Morning bird watching, breakfast, souvenir shopping, departure' }
+                ],
+                included: ['Family accommodation', 'All meals', 'Kids activities', 'Local transport'],
+                notIncluded: ['Travel to Ooty', 'Entry fees to attractions'],
+                lastBooked: '1 day ago'
+            },
+            {
+                id: 'trip_4',
+                title: 'Himachal Women\'s Trek',
+                location: 'Himachal Pradesh',
+                startDate: '2026-03-10',
+                endDate: '2026-03-15',
+                duration: '5 days, 4 nights',
+                price: 12500,
+                groupType: 'women_only',
+                interests: ['adventure', 'trekking'],
+                spotsTotal: 10,
+                spotsFilled: 7,
+                image: 'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&auto=format&fit=crop',
+                host: {
+                    id: 'host_4',
+                    name: 'Sneha Reddy',
+                    verified: true,
+                    tripsHosted: 12,
+                    bio: "Trek leader and women's empowerment advocate. Creating safe mountain experiences for women.",
+                    image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&auto=format&fit=crop'
+                },
+                description: 'Empower yourself with this all-women trek through stunning Himalayan landscapes. Build confidence, make friends, and conquer peaks!',
+                itinerary: [
+                    { day: 1, activities: 'Base camp arrival, acclimatization walk, trek briefing' },
+                    { day: 2, activities: 'Trek to camp 1, team building activities' },
+                    { day: 3, activities: 'Summit day, celebration at peak' },
+                    { day: 4, activities: 'Descent to base camp, bonfire stories' },
+                    { day: 5, activities: 'Morning yoga, breakfast, departure' }
+                ],
+                included: ['Trekking gear', 'All meals', 'Camping equipment', 'Female trek leader', 'Medical support'],
+                notIncluded: ['Travel to base camp', 'Personal trekking shoes', 'Insurance'],
+                lastBooked: '3 hours ago'
+            },
+            {
+                id: 'trip_5',
+                title: 'Kerala Backwaters Wellness Escape',
+                location: 'Kerala',
+                startDate: '2026-02-25',
+                endDate: '2026-02-28',
+                duration: '3 days, 2 nights',
+                price: 9500,
+                groupType: 'mixed',
+                interests: ['wellness', 'nature'],
+                spotsTotal: 10,
+                spotsFilled: 6,
+                image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&auto=format&fit=crop',
+                host: {
+                    id: 'host_5',
+                    name: 'Ravi Kumar',
+                    verified: true,
+                    tripsHosted: 25,
+                    bio: "Ayurveda practitioner and wellness retreat organizer with 10+ years experience.",
+                    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop'
+                },
+                description: 'Rejuvenate your mind and body with traditional Ayurveda treatments, houseboat stays, and serene backwater experiences.',
+                itinerary: [
+                    { day: 1, activities: 'Arrival, Ayurveda consultation, evening houseboat cruise' },
+                    { day: 2, activities: 'Morning yoga, traditional massage, village visit, sunset meditation' },
+                    { day: 3, activities: 'Sunrise boat ride, healthy breakfast, checkout' }
+                ],
+                included: ['Houseboat accommodation', 'All meals', 'Ayurveda treatments', 'Yoga sessions'],
+                notIncluded: ['Travel to Kerala', 'Additional spa services'],
+                lastBooked: '6 hours ago'
+            },
+            {
+                id: 'trip_6',
+                title: 'Rajasthan Cultural Heritage Tour',
+                location: 'Jaipur & Udaipur',
+                startDate: '2026-03-05',
+                endDate: '2026-03-10',
+                duration: '5 days, 4 nights',
+                price: 11000,
+                groupType: 'family_friendly',
+                interests: ['culture', 'heritage'],
+                spotsTotal: 16,
+                spotsFilled: 10,
+                image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800&auto=format&fit=crop',
+                host: {
+                    id: 'host_6',
+                    name: 'Meera Rathore',
+                    verified: true,
+                    tripsHosted: 20,
+                    bio: "Heritage guide and storyteller bringing Rajasthan's royal history to life.",
+                    image: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&auto=format&fit=crop'
+                },
+                description: 'Explore majestic palaces, vibrant markets, and rich culture of Rajasthan with your family. Kid-friendly activities included!',
+                itinerary: [
+                    { day: 1, activities: 'Jaipur arrival, City Palace visit, evening puppet show' },
+                    { day: 2, activities: 'Amber Fort, Jantar Mantar, traditional Rajasthani dinner' },
+                    { day: 3, activities: 'Travel to Udaipur, Lake Pichola boat ride' },
+                    { day: 4, activities: 'City Palace Udaipur, craft workshop, folk dance performance' },
+                    { day: 5, activities: 'Saheliyon ki Bari, shopping, departure' }
+                ],
+                included: ['All accommodation', 'All meals', 'Local transport', 'Entry fees', 'Guide services'],
+                notIncluded: ['Travel to/from Jaipur', 'Personal shopping'],
+                lastBooked: '4 hours ago'
+            }
+        ];
+
+        // Main App Component
+        function App() {
+            const [currentScreen, setCurrentScreen] = useState('home');
+            const [selectedTrip, setSelectedTrip] = useState(null);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [filters, setFilters] = useState({
+                groupType: [],
+                interests: []
+            });
+            const [showFilters, setShowFilters] = useState(false);
+            const [bookingData, setBookingData] = useState({
+                travelers: 1,
+                fullName: '',
+                phone: '',
+                email: '',
+                emergencyContact: ''
+            });
+            const [bookingStep, setBookingStep] = useState(1);
+            const [confirmationNumber, setConfirmationNumber] = useState('');
+            const [wishlist, setWishlist] = useState([]);
+
+            // Scroll to top on screen change
+            useEffect(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, [currentScreen]);
+
+            // Navigation
+            const navigateTo = (screen, trip = null) => {
+                setCurrentScreen(screen);
+                if (trip) setSelectedTrip(trip);
+                if (screen === 'booking') setBookingStep(1);
+            };
+
+            const toggleWishlist = (tripId) => {
+                setWishlist(prev => 
+                    prev.includes(tripId) 
+                        ? prev.filter(id => id !== tripId)
+                        : [...prev, tripId]
+                );
+            };
+
+            // Filtered trips
+            const filteredTrips = mockTrips.filter(trip => {
+                const matchesSearch = !searchQuery || 
+                    trip.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    trip.title.toLowerCase().includes(searchQuery.toLowerCase());
+                
+                const matchesGroupType = filters.groupType.length === 0 || 
+                    filters.groupType.includes(trip.groupType);
+                
+                const matchesInterests = filters.interests.length === 0 ||
+                    trip.interests.some(interest => filters.interests.includes(interest));
+                
+                return matchesSearch && matchesGroupType && matchesInterests;
+            });
+
+            // Components
+            const GroupTypeBadge = ({ type }) => {
+                const configs = {
+                    women_only: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Women-only' },
+                    family_friendly: { bg: 'bg-green-100', text: 'text-green-700', label: 'Family-friendly' },
+                    mixed: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Mixed Group' }
+                };
+                
+                const config = configs[type] || configs.mixed;
+                
+                return (
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
+                        {config.label}
+                    </span>
+                );
+            };
+
+            const TripCard = ({ trip, onSelect }) => (
+                <div 
+                    onClick={onSelect}
+                    className="bg-white rounded-lg overflow-hidden shadow-sm border cursor-pointer hover:shadow-md transition-shadow"
+                >
+                    <div className="relative">
+                        <img src={trip.image} alt={trip.title} className="w-full h-48 object-cover" />
+                        <div className="absolute top-2 left-2">
+                            <GroupTypeBadge type={trip.groupType} />
+                        </div>
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                toggleWishlist(trip.id);
+                            }}
+                            className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50"
+                        >
+                            <Icon name={wishlist.includes(trip.id) ? 'heartFilled' : 'heart'} 
+                                  className={`w-4 h-4 ${wishlist.includes(trip.id) ? 'text-red-500' : 'text-gray-600'}`} />
+                        </button>
+                    </div>
+                    
+                    <div className="p-4">
+                        <h3 className="font-bold mb-1 text-gray-900">{trip.title}</h3>
+                        <div className="flex items-center gap-1 text-gray-600 text-sm mb-2">
+                            <Icon name="mapPin" className="w-3 h-3" />
+                            <span>{trip.location}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                            <span>{new Date(trip.startDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })} - {new Date(trip.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
+                            <span>•</span>
+                            <span>{trip.duration}</span>
+                        </div>
+
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                                <img src={trip.host.image} alt={trip.host.name} className="w-6 h-6 rounded-full object-cover" />
+                                <span className="text-sm text-gray-600">by {trip.host.name}</span>
+                                {trip.host.verified && <Icon name="shield" className="w-3 h-3 text-blue-600" />}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-3 border-t">
+                            <div className="text-sm text-gray-600">
+                                {trip.spotsFilled}/{trip.spotsTotal} spots filled
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-bold text-blue-600">₹{trip.price.toLocaleString()}</span>
+                                <span className="text-sm text-gray-600"> /person</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Screens
+            const HomeScreen = () => (
+                <div className="min-h-screen bg-gray-50">
+                    {/* Header */}
+                    <div className="bg-white border-b sticky top-0 z-10">
+                        <div className="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
+                            <div className="text-xl font-bold text-blue-600">TravelGroup</div>
+                            <div className="flex gap-3">
+                                <button onClick={() => navigateTo('search')}>
+                                    <Icon name="search" className="w-5 h-5 text-gray-600" />
+                                </button>
+                                <button onClick={() => navigateTo('profile')}>
+                                    <Icon name="user" className="w-5 h-5 text-gray-600" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Hero Section */}
+                    <div className="bg-gradient-to-br from-blue-500 to-purple-600 text-white px-4 py-8">
+                        <h1 className="text-2xl font-bold mb-2">Find your next adventure</h1>
+                        <p className="text-blue-100 mb-4">Safe, curated group trips across India</p>
+                        
+                        {/* Search Bar */}
+                        <div className="bg-white rounded-lg p-3 shadow-lg">
+                            <div className="flex items-center gap-2 mb-3">
+                                <Icon name="mapPin" className="w-5 h-5 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Where do you want to go?"
+                                    className="flex-1 outline-none text-gray-800"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                            <button 
+                                onClick={() => navigateTo('search')}
+                                className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700"
+                            >
+                                Search Trips
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Filter Chips */}
+                    <div className="px-4 py-4 overflow-x-auto">
+                        <div className="flex gap-2 whitespace-nowrap">
+                            {[
+                                { label: 'Women-only trips', filterType: 'groupType', value: 'women_only' },
+                                { label: 'Family-friendly', filterType: 'groupType', value: 'family_friendly' },
+                                { label: 'Adventure', filterType: 'interests', value: 'adventure' },
+                                { label: 'Wellness', filterType: 'interests', value: 'wellness' },
+                                { label: 'Culture', filterType: 'interests', value: 'culture' },
+                                { label: 'Nature', filterType: 'interests', value: 'nature' }
+                            ].map(chip => (
+                                <button
+                                    key={chip.label}
+                                    onClick={() => {
+                                        setFilters(prev => ({
+                                            ...prev,
+                                            [chip.filterType]: [chip.value]
+                                        }));
+                                        navigateTo('search');
+                                    }}
+                                    className="px-4 py-2 bg-white rounded-full border border-gray-300 text-sm text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                                >
+                                    {chip.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Featured Trips */}
+                    <div className="px-4 pb-20">
+                        <h2 className="text-lg font-bold mb-3 text-gray-900">Upcoming Trips</h2>
+                        <div className="space-y-4">
+                            {mockTrips.map(trip => (
+                                <TripCard key={trip.id} trip={trip} onSelect={() => navigateTo('detail', trip)} />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Bottom CTA */}
+                    <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">
+                        <div className="max-w-md mx-auto">
+                            <button
+                                onClick={() => navigateTo('hostDashboard')}
+                                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700"
+                            >
+                                List your trip
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const SearchScreen = () => (
+                <div className="min-h-screen bg-gray-50 pb-4">
+                    {/* Top Bar */}
+                    <div className="bg-white border-b sticky top-0 z-10">
+                        <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+                            <button onClick={() => navigateTo('home')}>
+                                <Icon name="arrowLeft" className="w-5 h-5" />
+                            </button>
+                            <div className="flex-1">
+                                <input
+                                    type="text"
+                                    placeholder="Search destination..."
+                                    className="w-full outline-none"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                            <button onClick={() => setShowFilters(true)}>
+                                <Icon name="filter" className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Active Filters */}
+                    {(filters.groupType.length > 0 || filters.interests.length > 0) && (
+                        <div className="px-4 py-3 bg-white border-b">
+                            <div className="flex flex-wrap gap-2">
+                                {[...filters.groupType, ...filters.interests].map(filter => (
+                                    <div key={filter} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm flex items-center gap-2">
+                                        {filter.replace('_', ' ')}
+                                        <button onClick={() => {
+                                            setFilters({
+                                                groupType: filters.groupType.filter(f => f !== filter),
+                                                interests: filters.interests.filter(f => f !== filter)
+                                            });
+                                        }}>
+                                            <Icon name="x" className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button 
+                                    onClick={() => setFilters({ groupType: [], interests: [] })}
+                                    className="text-sm text-blue-600"
+                                >
+                                    Clear all
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Results */}
+                    <div className="px-4 py-4">
+                        <p className="text-sm text-gray-600 mb-4">{filteredTrips.length} trips found</p>
+                        
+                        {filteredTrips.length === 0 ? (
+                            <div className="text-center py-12">
+                                <p className="text-gray-600 mb-4">No trips match your search</p>
+                                <button 
+                                    onClick={() => {
+                                        setFilters({ groupType: [], interests: [] });
+                                        setSearchQuery('');
+                                    }}
+                                    className="text-blue-600 hover:underline"
+                                >
+                                    Clear filters and browse all trips
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {filteredTrips.map(trip => (
+                                    <TripCard key={trip.id} trip={trip} onSelect={() => navigateTo('detail', trip)} />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Filter Sheet */}
+                    {showFilters && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">
+                            <div className="bg-white w-full rounded-t-2xl max-h-[80vh] overflow-y-auto">
+                                <div className="sticky top-0 bg-white border-b px-4 py-4 flex justify-between items-center">
+                                    <h3 className="font-bold text-lg">Filters</h3>
+                                    <button onClick={() => setShowFilters(false)}>
+                                        <Icon name="x" className="w-5 h-5" />
+                                    </button>
+                                </div>
+                                
+                                <div className="p-4 space-y-6">
+                                    <div>
+                                        <h4 className="font-medium mb-3">Group Type</h4>
+                                        {['women_only', 'family_friendly', 'mixed'].map(type => (
+                                            <label key={type} className="flex items-center gap-2 mb-2 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={filters.groupType.includes(type)}
+                                                    onChange={(e) => {
+                                                        setFilters(prev => ({
+                                                            ...prev,
+                                                            groupType: e.target.checked
+                                                                ? [...prev.groupType, type]
+                                                                : prev.groupType.filter(t => t !== type)
+                                                        }));
+                                                    }}
+                                                    className="w-4 h-4"
+                                                />
+                                                <span className="capitalize">{type.replace('_', ' ')}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    <div>
+                                        <h4 className="font-medium mb-3">Interests</h4>
+                                        {['adventure', 'wellness', 'culture', 'nature', 'heritage', 'beach'].map(interest => (
+                                            <label key={interest} className="flex items-center gap-2 mb-2 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={filters.interests.includes(interest)}
+                                                    onChange={(e) => {
+                                                        setFilters(prev => ({
+                                                            ...prev,
+                                                            interests: e.target.checked
+                                                                ? [...prev.interests, interest]
+                                                                : prev.interests.filter(i => i !== interest)
+                                                        }));
+                                                    }}
+                                                    className="w-4 h-4"
+                                                />
+                                                <span className="capitalize">{interest}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="sticky bottom-0 bg-white border-t p-4">
+                                    <button
+                                        onClick={() => setShowFilters(false)}
+                                        className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700"
+                                    >
+                                        Apply Filters
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+
+            const TripDetailScreen = () => {
+                if (!selectedTrip) return null;
+
+                return (
+                    <div className="min-h-screen bg-white pb-20">
+                        {/* Image Gallery */}
+                        <div className="relative">
+                            <img src={selectedTrip.image} alt={selectedTrip.title} className="w-full h-64 object-cover" />
+                            <button 
+                                onClick={() => navigateTo('search')}
+                                className="absolute top-4 left-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-50"
+                            >
+                                <Icon name="arrowLeft" className="w-5 h-5" />
+                            </button>
+                            <button 
+                                onClick={() => toggleWishlist(selectedTrip.id)}
+                                className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-50"
+                            >
+                                <Icon name={wishlist.includes(selectedTrip.id) ? 'heartFilled' : 'heart'} 
+                                      className={`w-5 h-5 ${wishlist.includes(selectedTrip.id) ? 'text-red-500' : 'text-gray-600'}`} />
+                            </button>
+                        </div>
+
+                        {/* Header */}
+                        <div className="px-4 py-4 border-b">
+                            <div className="flex items-center gap-2 mb-2">
+                                <GroupTypeBadge type={selectedTrip.groupType} />
+                            </div>
+                            <h1 className="text-2xl font-bold mb-2 text-gray-900">{selectedTrip.title}</h1>
+                            <div className="flex items-center gap-1 text-gray-600 mb-3">
+                                <Icon name="mapPin" className="w-4 h-4" />
+                                <span className="text-sm">{selectedTrip.location}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600">
+                                        {new Date(selectedTrip.startDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })} - {new Date(selectedTrip.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </p>
+                                    <p className="text-sm text-gray-600">{selectedTrip.duration}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-2xl font-bold text-blue-600">₹{selectedTrip.price.toLocaleString()}</p>
+                                    <p className="text-sm text-gray-600">per person</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Host Info */}
+                        <div className="px-4 py-4 border-b">
+                            <div className="flex items-center gap-3">
+                                <img src={selectedTrip.host.image} alt={selectedTrip.host.name} className="w-12 h-12 rounded-full object-cover" />
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-medium">{selectedTrip.host.name}</span>
+                                        {selectedTrip.host.verified && (
+                                            <Icon name="shield" className="w-4 h-4 text-blue-600" />
+                                        )}
+                                    </div>
+                                    <p className="text-sm text-gray-600">{selectedTrip.host.tripsHosted} trips hosted</p>
+                                </div>
+                                <Icon name="chevronRight" className="w-5 h-5 text-gray-400" />
+                            </div>
+                            <p className="text-sm text-gray-700 mt-3">{selectedTrip.host.bio}</p>
+                        </div>
+
+                        {/* Trip Details */}
+                        <div className="px-4 py-4 border-b">
+                            <h3 className="font-bold mb-3 text-gray-900">About this trip</h3>
+                            <p className="text-gray-700 mb-4">{selectedTrip.description}</p>
+                            
+                            <div className="mb-4">
+                                <h4 className="font-medium mb-2">Group Info</h4>
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Icon name="users" className="w-4 h-4 text-gray-600" />
+                                    <span>{selectedTrip.spotsFilled}/{selectedTrip.spotsTotal} spots filled</span>
+                                </div>
+                                <div className="mt-2 bg-gray-200 rounded-full h-2">
+                                    <div 
+                                        className="bg-blue-600 h-2 rounded-full transition-all"
+                                        style={{ width: `${(selectedTrip.spotsFilled / selectedTrip.spotsTotal) * 100}%` }}
+                                    />
+                                </div>
+                                {selectedTrip.spotsTotal - selectedTrip.spotsFilled <= 3 && (
+                                    <p className="text-sm text-orange-600 mt-2">
+                                        Only {selectedTrip.spotsTotal - selectedTrip.spotsFilled} spots left!
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Itinerary */}
+                        <div className="px-4 py-4 border-b">
+                            <h3 className="font-bold mb-3 text-gray-900">Itinerary</h3>
+                            {selectedTrip.itinerary.map((day, idx) => (
+                                <div key={idx} className="mb-3 flex gap-3">
+                                    <div className="flex-shrink-0">
+                                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium">
+                                            {day.day}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">Day {day.day}</p>
+                                        <p className="text-sm text-gray-700">{day.activities}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* What's Included */}
+                        <div className="px-4 py-4 border-b">
+                            <h3 className="font-bold mb-3 text-gray-900">What's Included</h3>
+                            {selectedTrip.included.map((item, idx) => (
+                                <div key={idx} className="flex items-start gap-2 mb-2">
+                                    <Icon name="check" className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                                    <span className="text-sm text-gray-700">{item}</span>
+                                </div>
+                            ))}
+                            
+                            <h3 className="font-bold mb-3 mt-4 text-gray-900">What's Not Included</h3>
+                            {selectedTrip.notIncluded.map((item, idx) => (
+                                <div key={idx} className="flex items-start gap-2 mb-2">
+                                    <Icon name="x" className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                                    <span className="text-sm text-gray-700">{item}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Safety */}
+                        <div className="px-4 py-4">
+                            <h3 className="font-bold mb-3 text-gray-900">Safety & Trust</h3>
+                            <div className="flex items-center gap-2 mb-2">
+                                <Icon name="shield" className="w-5 h-5 text-blue-600" />
+                                <span className="text-sm font-medium">Verified Host</span>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-3">This host has been verified by TravelGroup</p>
+                            <p className="text-sm text-gray-600">
+                                <strong>Cancellation:</strong> Free cancellation until 7 days before trip
+                            </p>
+                            {selectedTrip.lastBooked && (
+                                <p className="text-sm text-gray-600 mt-2">Last booked {selectedTrip.lastBooked}</p>
+                            )}
+                        </div>
+
+                        {/* Sticky Bottom Bar */}
+                        <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
+                            <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600">Total price</p>
+                                    <p className="text-xl font-bold">₹{selectedTrip.price.toLocaleString()}</p>
+                                </div>
+                                <button
+                                    onClick={() => selectedTrip.spotsFilled < selectedTrip.spotsTotal && navigateTo('booking')}
+                                    disabled={selectedTrip.spotsFilled >= selectedTrip.spotsTotal}
+                                    className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                >
+                                    {selectedTrip.spotsFilled >= selectedTrip.spotsTotal ? 'Fully Booked' : 'Join Trip'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const BookingScreen = () => {
+                if (!selectedTrip) return null;
+
+                const handleContinue = () => {
+                    if (bookingStep === 1) {
+                        if (bookingData.fullName && bookingData.phone && bookingData.email && bookingData.emergencyContact) {
+                            setBookingStep(2);
+                        }
+                    } else {
+                        const confNum = 'TG' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                        setConfirmationNumber(confNum);
+                        navigateTo('confirmation');
+                    }
+                };
+
+                const isFormValid = bookingData.fullName && bookingData.phone && bookingData.email && bookingData.emergencyContact;
+
+                return (
+                    <div className="min-h-screen bg-gray-50 pb-24">
+                        {/* Header */}
+                        <div className="bg-white border-b sticky top-0 z-10">
+                            <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+                                <button onClick={() => navigateTo('detail', selectedTrip)}>
+                                    <Icon name="arrowLeft" className="w-5 h-5" />
+                                </button>
+                                <h1 className="font-bold">Book Your Trip</h1>
+                            </div>
+                        </div>
+
+                        {/* Progress Steps */}
+                        <div className="bg-white px-4 py-4 border-b">
+                            <div className="flex items-center justify-between max-w-md mx-auto">
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${bookingStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
+                                        {bookingStep > 1 ? <Icon name="check" className="w-5 h-5" /> : '1'}
+                                    </div>
+                                    <span className="text-sm font-medium">Details</span>
+                                </div>
+                                <div className="flex-1 h-0.5 bg-gray-300 mx-2" />
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${bookingStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
+                                        2
+                                    </div>
+                                    <span className="text-sm font-medium">Payment</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Trip Summary */}
+                        <div className="bg-white px-4 py-4 border-b sticky top-16 z-10">
+                            <div className="flex gap-3">
+                                <img src={selectedTrip.image} alt={selectedTrip.title} className="w-20 h-20 rounded-lg object-cover" />
+                                <div className="flex-1">
+                                    <h3 className="font-medium mb-1">{selectedTrip.title}</h3>
+                                    <p className="text-sm text-gray-600">
+                                        {new Date(selectedTrip.startDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })} - {new Date(selectedTrip.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Form Content */}
+                        <div className="px-4 py-6 space-y-6">
+                            {bookingStep === 1 ? (
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">Number of Travelers</label>
+                                        <select 
+                                            value={bookingData.travelers}
+                                            onChange={(e) => setBookingData({...bookingData, travelers: parseInt(e.target.value)})}
+                                            className="w-full border rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                        >
+                                            {[1,2,3,4].map(n => (
+                                                <option key={n} value={n}>{n} {n === 1 ? 'traveler' : 'travelers'}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">Full Name *</label>
+                                        <input
+                                            type="text"
+                                            value={bookingData.fullName}
+                                            onChange={(e) => setBookingData({...bookingData, fullName: e.target.value})}
+                                            placeholder="As per ID"
+                                            className="w-full border rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">Phone Number *</label>
+                                        <input
+                                            type="tel"
+                                            value={bookingData.phone}
+                                            onChange={(e) => setBookingData({...bookingData, phone: e.target.value})}
+                                            placeholder="10-digit mobile number"
+                                            className="w-full border rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                        />
+                                        <p className="text-xs text-gray-600 mt-1">We'll send an OTP to verify</p>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">Email *</label>
+                                        <input
+                                            type="email"
+                                            value={bookingData.email}
+                                            onChange={(e) => setBookingData({...bookingData, email: e.target.value})}
+                                            placeholder="you@example.com"
+                                            className="w-full border rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">Emergency Contact *</label>
+                                        <input
+                                            type="tel"
+                                            value={bookingData.emergencyContact}
+                                            onChange={(e) => setBookingData({...bookingData, emergencyContact: e.target.value})}
+                                            placeholder="Contact number"
+                                            className="w-full border rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                        />
+                                    </div>
+
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                        <p className="text-sm text-gray-700">
+                                            <strong>Cancellation Policy:</strong> Free cancellation until 7 days before trip
+                                        </p>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div>
+                                        <h3 className="font-bold mb-3">Price Breakdown</h3>
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between text-sm">
+                                                <span>Trip cost (₹{selectedTrip.price.toLocaleString()} × {bookingData.travelers})</span>
+                                                <span>₹{(selectedTrip.price * bookingData.travelers).toLocaleString()}</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm">
+                                                <span>Platform fee</span>
+                                                <span>₹{(bookingData.travelers * 500).toLocaleString()}</span>
+                                            </div>
+                                            <div className="border-t pt-2 flex justify-between font-bold">
+                                                <span>Total</span>
+                                                <span>₹{((selectedTrip.price * bookingData.travelers) + (bookingData.travelers * 500)).toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white border rounded-lg p-4">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Icon name="shield" className="w-5 h-5 text-green-600" />
+                                            <span className="text-sm font-medium">Secured by Razorpay</span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <button className="w-full border-2 border-blue-600 text-blue-600 py-3 rounded-lg font-medium hover:bg-blue-50">
+                                                UPI
+                                            </button>
+                                            <button className="w-full border py-3 rounded-lg hover:bg-gray-50">
+                                                Credit/Debit Card
+                                            </button>
+                                            <button className="w-full border py-3 rounded-lg hover:bg-gray-50">
+                                                Net Banking
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Bottom CTA */}
+                        <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
+                            <div className="max-w-md mx-auto px-4 py-3">
+                                <button
+                                    onClick={handleContinue}
+                                    disabled={bookingStep === 1 && !isFormValid}
+                                    className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700"
+                                >
+                                    {bookingStep === 1 ? 'Continue to Payment' : `Pay ₹${((selectedTrip.price * bookingData.travelers) + (bookingData.travelers * 500)).toLocaleString()}`}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const ConfirmationScreen = () => {
+                if (!selectedTrip) return null;
+
+                return (
+                    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+                        <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-lg">
+                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Icon name="check" className="w-8 h-8 text-green-600" />
+                            </div>
+                            
+                            <h1 className="text-2xl font-bold mb-2">You're all set!</h1>
+                            <p className="text-gray-600 mb-6">{selectedTrip.title}</p>
+                            
+                            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                                <p className="text-sm text-gray-600 mb-1">Booking Reference</p>
+                                <p className="text-xl font-bold text-blue-600">{confirmationNumber}</p>
+                            </div>
+
+                            <div className="text-left mb-6 space-y-3">
+                                <h3 className="font-bold">What happens next?</h3>
+                                <div className="flex gap-3">
+                                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 text-sm">1</div>
+                                    <p className="text-sm text-gray-700">You'll receive confirmation email</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 text-sm">2</div>
+                                    <p className="text-sm text-gray-700">Host will reach out 48 hours before trip</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 text-sm">3</div>
+                                    <p className="text-sm text-gray-700">Join the group chat</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <button
+                                    onClick={() => {
+                                        navigateTo('home');
+                                        setBookingData({
+                                            travelers: 1,
+                                            fullName: '',
+                                            phone: '',
+                                            email: '',
+                                            emergencyContact: ''
+                                        });
+                                    }}
+                                    className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700"
+                                >
+                                    Explore More Trips
+                                </button>
+                                <button className="w-full border border-gray-300 py-3 rounded-lg font-medium hover:bg-gray-50">
+                                    View Booking Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const HostDashboard = () => {
+                return (
+                    <div className="min-h-screen bg-gray-50">
+                        {/* Header */}
+                        <div className="bg-white border-b">
+                            <div className="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
+                                <div className="flex items-center gap-3">
+                                    <button onClick={() => navigateTo('home')}>
+                                        <Icon name="arrowLeft" className="w-5 h-5" />
+                                    </button>
+                                    <h1 className="font-bold">Dashboard</h1>
+                                </div>
+                                <button><Icon name="menu" className="w-5 h-5" /></button>
+                            </div>
+                        </div>
+
+                        {/* Host Overview */}
+                        <div className="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-4 py-6">
+                            <h2 className="text-xl font-bold mb-1">Welcome back!</h2>
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="text-sm">Host Status:</span>
+                                <span className="px-2 py-1 bg-white bg-opacity-20 rounded text-sm">Verified</span>
+                            </div>
+                            
+                            <div className="grid grid-cols-3 gap-3">
+                                <div className="bg-white bg-opacity-10 rounded-lg p-3">
+                                    <p className="text-2xl font-bold">3</p>
+                                    <p className="text-xs">Active Trips</p>
+                                </div>
+                                <div className="bg-white bg-opacity-10 rounded-lg p-3">
+                                    <p className="text-2xl font-bold">12</p>
+                                    <p className="text-xs">Bookings</p>
+                                </div>
+                                <div className="bg-white bg-opacity-10 rounded-lg p-3">
+                                    <p className="text-2xl font-bold">2</p>
+                                    <p className="text-xs">Actions</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Quick Actions */}
+                        <div className="px-4 py-6">
+                            <button
+                                onClick={() => navigateTo('createTrip')}
+                                className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-blue-700"
+                            >
+                                <Icon name="plus" className="w-5 h-5" />
+                                Create New Trip
+                            </button>
+                        </div>
+
+                        {/* Trips List */}
+                        <div className="px-4 pb-6">
+                            <div className="flex gap-4 mb-4 border-b">
+                                <button className="pb-2 border-b-2 border-blue-600 font-medium">Upcoming</button>
+                                <button className="pb-2 text-gray-600">Past</button>
+                                <button className="pb-2 text-gray-600">Drafts</button>
+                            </div>
+
+                            <div className="space-y-3">
+                                {mockTrips.slice(0, 2).map(trip => (
+                                    <div key={trip.id} className="bg-white rounded-lg p-4 border">
+                                        <div className="flex gap-3">
+                                            <img src={trip.image} alt={trip.title} className="w-20 h-20 rounded-lg object-cover" />
+                                            <div className="flex-1">
+                                                <h3 className="font-medium mb-1">{trip.title}</h3>
+                                                <p className="text-sm text-gray-600 mb-2">
+                                                    {new Date(trip.startDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                                                </p>
+                                                <div className="flex items-center gap-2">
+                                                    <Icon name="users" className="w-4 h-4 text-gray-600" />
+                                                    <span className="text-sm">{trip.spotsFilled}/{trip.spotsTotal} booked</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2 mt-3">
+                                            <button className="flex-1 border py-2 rounded text-sm hover:bg-gray-50">View Details</button>
+                                            <button className="flex-1 border py-2 rounded text-sm hover:bg-gray-50">Edit</button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const CreateTripScreen = () => {
+                const [tripForm, setTripForm] = useState({
+                    title: '',
+                    location: '',
+                    startDate: '',
+                    endDate: '',
+                    groupType: 'mixed',
+                    price: '',
+                    minParticipants: '',
+                    maxParticipants: ''
+                });
+
+                return (
+                    <div className="min-h-screen bg-gray-50 pb-24">
+                        {/* Header */}
+                        <div className="bg-white border-b sticky top-0 z-10">
+                            <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+                                <button onClick={() => navigateTo('hostDashboard')}>
+                                    <Icon name="arrowLeft" className="w-5 h-5" />
+                                </button>
+                                <h1 className="font-bold">Create New Trip</h1>
+                            </div>
+                        </div>
+
+                        {/* Progress Steps */}
+                        <div className="bg-white px-4 py-4 border-b overflow-x-auto">
+                            <div className="flex items-center justify-between text-xs min-w-max">
+                                <div className="flex flex-col items-center">
+                                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center mb-1">1</div>
+                                    <span>Basic Info</span>
+                                </div>
+                                <div className="flex-1 h-0.5 bg-gray-300 mx-2 min-w-[40px]" />
+                                <div className="flex flex-col items-center">
+                                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mb-1">2</div>
+                                    <span>Itinerary</span>
+                                </div>
+                                <div className="flex-1 h-0.5 bg-gray-300 mx-2 min-w-[40px]" />
+                                <div className="flex flex-col items-center">
+                                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mb-1">3</div>
+                                    <span>Details</span>
+                                </div>
+                                <div className="flex-1 h-0.5 bg-gray-300 mx-2 min-w-[40px]" />
+                                <div className="flex flex-col items-center">
+                                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mb-1">4</div>
+                                    <span>Publish</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Form */}
+                        <div className="px-4 py-6 space-y-6">
+                            <div>
+                                <label className="block text-sm font-medium mb-2">Trip Title *</label>
+                                <input
+                                    type="text"
+                                    value={tripForm.title}
+                                    onChange={(e) => setTripForm({...tripForm, title: e.target.value})}
+                                    placeholder="e.g., Goa Beach Yoga Retreat"
+                                    className="w-full border rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                />
+                                <p className="text-xs text-gray-600 mt-1">Choose a catchy title that describes the experience</p>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium mb-2">Destination *</label>
+                                <input
+                                    type="text"
+                                    value={tripForm.location}
+                                    onChange={(e) => setTripForm({...tripForm, location: e.target.value})}
+                                    placeholder="City or region"
+                                    className="w-full border rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">Start Date *</label>
+                                    <input
+                                        type="date"
+                                        value={tripForm.startDate}
+                                        onChange={(e) => setTripForm({...tripForm, startDate: e.target.value})}
+                                        className="w-full border rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">End Date *</label>
+                                    <input
+                                        type="date"
+                                        value={tripForm.endDate}
+                                        onChange={(e) => setTripForm({...tripForm, endDate: e.target.value})}
+                                        className="w-full border rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium mb-2">Group Type *</label>
+                                <div className="space-y-2">
+                                    {[
+                                        { value: 'mixed', label: 'Mixed (Open to all)' },
+                                        { value: 'women_only', label: 'Women-only' },
+                                        { value: 'family_friendly', label: 'Family-friendly' }
+                                    ].map(option => (
+                                        <label key={option.value} className="flex items-center gap-2 border rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-50">
+                                            <input
+                                                type="radio"
+                                                name="groupType"
+                                                value={option.value}
+                                                checked={tripForm.groupType === option.value}
+                                                onChange={(e) => setTripForm({...tripForm, groupType: e.target.value})}
+                                            />
+                                            <span>{option.label}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium mb-2">Upload Cover Image *</label>
+                                <button className="w-full border-2 border-dashed rounded-lg py-8 flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50">
+                                    <Icon name="upload" className="w-8 h-8 text-gray-400" />
+                                    <span className="text-sm text-gray-600">Click to upload image</span>
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">Min Participants *</label>
+                                    <input
+                                        type="number"
+                                        value={tripForm.minParticipants}
+                                        onChange={(e) => setTripForm({...tripForm, minParticipants: e.target.value})}
+                                        placeholder="6"
+                                        className="w-full border rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">Max Participants *</label>
+                                    <input
+                                        type="number"
+                                        value={tripForm.maxParticipants}
+                                        onChange={(e) => setTripForm({...tripForm, maxParticipants: e.target.value})}
+                                        placeholder="12"
+                                        className="w-full border rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium mb-2">Price per Person *</label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-2 text-gray-600">₹</span>
+                                    <input
+                                        type="number"
+                                        value={tripForm.price}
+                                        onChange={(e) => setTripForm({...tripForm, price: e.target.value})}
+                                        placeholder="8500"
+                                        className="w-full border rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Bottom Actions */}
+                        <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
+                            <div className="max-w-md mx-auto px-4 py-3 flex gap-3">
+                                <button className="flex-1 border py-3 rounded-lg font-medium hover:bg-gray-50">
+                                    Save as Draft
+                                </button>
+                                <button className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700">
+                                    Continue
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const ProfileScreen = () => {
+                return (
+                    <div className="min-h-screen bg-gray-50">
+                        {/* Header */}
+                        <div className="bg-white border-b">
+                            <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+                                <button onClick={() => navigateTo('home')}>
+                                    <Icon name="arrowLeft" className="w-5 h-5" />
+                                </button>
+                                <h1 className="font-bold">Profile</h1>
+                            </div>
+                        </div>
+
+                        {/* Profile Info */}
+                        <div className="bg-white px-4 py-6 border-b">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                    <span className="text-white text-2xl font-bold">U</span>
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold">User Name</h2>
+                                    <p className="text-gray-600 text-sm">user@example.com</p>
+                                </div>
+                            </div>
+                            <button className="w-full border border-blue-600 text-blue-600 py-2 rounded-lg font-medium hover:bg-blue-50">
+                                Edit Profile
+                            </button>
+                        </div>
+
+                        {/* Menu Options */}
+                        <div className="mt-4">
+                            <div className="bg-white border-b">
+                                <button 
+                                    onClick={() => {
+                                        const wishlisted = mockTrips.filter(t => wishlist.includes(t.id));
+                                        if (wishlisted.length > 0) {
+                                            navigateTo('wishlist');
+                                        }
+                                    }}
+                                    className="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Icon name="heart" className="w-5 h-5 text-gray-600" />
+                                        <span>My Wishlist</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {wishlist.length > 0 && (
+                                            <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs">
+                                                {wishlist.length}
+                                            </span>
+                                        )}
+                                        <Icon name="chevronRight" className="w-5 h-5 text-gray-400" />
+                                    </div>
+                                </button>
+                            </div>
+
+                            <div className="bg-white border-b">
+                                <button className="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50">
+                                    <div className="flex items-center gap-3">
+                                        <Icon name="calendar" className="w-5 h-5 text-gray-600" />
+                                        <span>My Bookings</span>
+                                    </div>
+                                    <Icon name="chevronRight" className="w-5 h-5 text-gray-400" />
+                                </button>
+                            </div>
+
+                            <div className="bg-white border-b">
+                                <button 
+                                    onClick={() => navigateTo('hostDashboard')}
+                                    className="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Icon name="plus" className="w-5 h-5 text-gray-600" />
+                                        <span>Become a Host</span>
+                                    </div>
+                                    <Icon name="chevronRight" className="w-5 h-5 text-gray-400" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Settings Section */}
+                        <div className="mt-4">
+                            <div className="px-4 py-2">
+                                <h3 className="text-sm font-medium text-gray-500">SETTINGS</h3>
+                            </div>
+                            <div className="bg-white border-b">
+                                <button className="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50">
+                                    <div className="flex items-center gap-3">
+                                        <Icon name="user" className="w-5 h-5 text-gray-600" />
+                                        <span>Account Settings</span>
+                                    </div>
+                                    <Icon name="chevronRight" className="w-5 h-5 text-gray-400" />
+                                </button>
+                            </div>
+
+                            <div className="bg-white border-b">
+                                <button className="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50">
+                                    <div className="flex items-center gap-3">
+                                        <Icon name="shield" className="w-5 h-5 text-gray-600" />
+                                        <span>Privacy & Safety</span>
+                                    </div>
+                                    <Icon name="chevronRight" className="w-5 h-5 text-gray-400" />
+                                </button>
+                            </div>
+
+                            <div className="bg-white border-b">
+                                <button className="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50">
+                                    <span className="text-red-600">Sign Out</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const WishlistScreen = () => {
+                const wishlistedTrips = mockTrips.filter(trip => wishlist.includes(trip.id));
+
+                return (
+                    <div className="min-h-screen bg-gray-50">
+                        {/* Header */}
+                        <div className="bg-white border-b">
+                            <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+                                <button onClick={() => navigateTo('profile')}>
+                                    <Icon name="arrowLeft" className="w-5 h-5" />
+                                </button>
+                                <h1 className="font-bold">My Wishlist</h1>
+                            </div>
+                        </div>
+
+                        <div className="px-4 py-4">
+                            {wishlistedTrips.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <Icon name="heart" className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                    <h3 className="text-lg font-bold mb-2">No saved trips yet</h3>
+                                    <p className="text-gray-600 mb-6">Start saving trips you love to book them later</p>
+                                    <button 
+                                        onClick={() => navigateTo('home')}
+                                        className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700"
+                                    >
+                                        Explore Trips
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <p className="text-sm text-gray-600 mb-4">{wishlistedTrips.length} saved {wishlistedTrips.length === 1 ? 'trip' : 'trips'}</p>
+                                    <div className="space-y-4">
+                                        {wishlistedTrips.map(trip => (
+                                            <TripCard key={trip.id} trip={trip} onSelect={() => navigateTo('detail', trip)} />
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                );
+            };
+
+            // Render current screen
+            const renderScreen = () => {
+                switch (currentScreen) {
+                    case 'home': return <HomeScreen />;
+                    case 'search': return <SearchScreen />;
+                    case 'detail': return <TripDetailScreen />;
+                    case 'booking': return <BookingScreen />;
+                    case 'confirmation': return <ConfirmationScreen />;
+                    case 'hostDashboard': return <HostDashboard />;
+                    case 'createTrip': return <CreateTripScreen />;
+                    case 'profile': return <ProfileScreen />;
+                    case 'wishlist': return <WishlistScreen />;
+                    default: return <HomeScreen />;
+                }
+            };
+
+            return (
+                <div className="max-w-md mx-auto bg-white min-h-screen">
+                    {renderScreen()}
+                </div>
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
